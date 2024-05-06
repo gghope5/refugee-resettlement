@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Global Refugee Resettlement Systems</title>
+	<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			background: "whitesmoke";
+			font-family: "Ubuntu", sans-serif;
+			color: #3d3d3d;
+		}
+
+		h1 {
+			position: absolute;
+			margin-top: 0;
+			top: 10px;
+			left: 45px;
+			font-size: 2em;
+			font-family: "Ubuntu", serif;
+			letter-spacing: .04em;
+			padding: 10px 15px;
+			background: rgba(256, 256, 256);
+			border: 1px solid grey;
+			border-radius: 3px;
+			z-index: 800;
+		}
+
+		h2 {
+			font-family: "Ubuntu", serif;
+			letter-spacing: .04em;
+		}
+
+		#map {
+			position: absolute;
+			height: 100%;
+			width: 100%;
+		}
+
+		.info{
+			z-index: 1000;
+			position: absolute;
+			right: 20px;
+			top: 20px;
+			padding: 6px 8px;
+			font-size: .9em;
+			font-family: "Ubuntu", serif;
+			text-align: right;
+			background: white;
+			background: rgba(255, 255, 255, 0.8);
+			box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+			border-radius: 5px
+		}
+
+		.info h1 {
+			font-size: 16px;
+			margin: 0 0 5px;
+			color: #777777;
+		}
+
+		section {
+			position: absolute;
+			bottom: 0;
+			left: 10px;
+			width: 280px;
+			margin: 20px auto;
+			padding: 0 15px;
+			background: rgba(256, 256, 256);
+			border: 1px solid grey;
+			border-radius: 3px;
+			z-index: 800;
+		}
+
+		p {
+			font-size: .9em;
+			line-height: 1.5em;
+		}
+
+		a {
+			color: #005daa;
+			text-decoration: none;
+		}
+
+		a:hover {
+			text-decoration: underline;
+		}
+
+		.legend {
+            line-height: 40px;
+            font-size: 16px;
+            width: 190px;
+            color: #333333;
+            padding: 6px 8px;
+            background: white;
+            background: rgba(255,255,255,0.6);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+		}
+
+        .legend {
+            font-family: 'Ubuntu', sans-serif;
+        }
+
+        .legend i {
+            width: 20px;
+            height: 20px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.4;
+        }
+
+        .legend img {
+            width: 16px;
+            height: 16px;
+            margin-right: 3px;
+            float: left;
+        }
+
+        .legend p {
+            font-size: .9em;
+            line-height: 1.5em;
+            margin: 0;
+        }
+
+	</style>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.css" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Lora" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/1.3.4/chroma.min.js"></script>
+</head>
+
+<body>
+
+	<h1>UNHCR Certified Refugee Resettlement Programs</h1>
+
+	<div id='map'></div>
+	<div class="legend"></div>
+
+	<section>
+		<h2>About This Map</h2>
+
+		<p>This map shows refugee resettlement programs around the world that are certified by the <a href="https://www.unhcr.org/">United Nations High Commission for Refugees</a>. Click on a country to find out more!</p>
+
+		<p>With refugees and refugee resettlement being a hot button political issue for as many years as there has existed the term “refugee”, spreading awareness and accurate information about refugee populations and the programs that exist to help them is extremely important. This map aims to allow a user to easily compare and contrast refugee resettlement programs, as well as to locate them in the world and visually analyze spatial distribution of these programs.
+		</p>
+
+		<p>More data can be found on the spreadsheet linked <a href="https://docs.google.com/spreadsheets/d/1NF0jY_8kuDlAw14pQQ7KU55GjHWFCUCl/edit?usp=sharing&ouid=116709855626998950786&rtpof=true&sd=true">here</a></p>
+
+		<p>Map authored by Gloria Hope</p>
+
+	</section>
+	<script>
+
+		var map = L.map('map', {
+            center: [34.14587847982817, -14.259817152943654],
+            zoom: 3,
+            maxZoom: 22,
+            minZoom: 3,
+            detectRetina: true
+        });
+
+		var Stadia_AlidadeSmooth = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.{ext}', {
+			minZoom: 0,
+			maxZoom: 20,
+			attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+			ext: 'png'
+		}).addTo(map);
+
+		colors = chroma.scale('GnBu').colors(5); 
+
+        function setColor(density) {
+            var id = 0;
+            if (density > 3000) { id = 4; } 
+            else if (density > 1500 && density <= 3000) { id = 3; } 
+            else if (density > 500 && density <= 1500) { id = 2; } 
+			else if (density > 350 && density <= 500) {id = 1;}
+            else { id = 0;}
+            return colors[id];
+        }
+
+        function style(feature) {
+            return {
+                fillColor: setColor(feature.properties.FinalProject_AnnualResettlement),
+                fillOpacity: 0.7,
+                weight: 2,
+                opacity: 1,
+                color: '#b4b4b4',
+                dashArray: '4'
+            };
+        }
+
+		var geojson = null;
+
+		var info = L.control();
+
+		info.onAdd = function (map) {
+			this._div = L.DomUtil.create('div', 'info');
+			this.update();
+			return this._div;
+		};
+
+		info.update = function (props) {                
+			this._div.innerHTML = '<h4>Annual Refugee Resettlement Quota</h4>' +  (props ?                    
+			'<b>' + props.NAME + '</b><br />' + props.FinalProject_AnnualResettlement + '<h4>Year Program Started</h4>' + props.FinalProject_ActiveSince + '<h4>Notes</h4>' + props.FinalProject_Notes                  
+			: 'Click on a country');            
+			};
+                    
+        info.addTo(map);
+
+		function highlightFeature(e) {
+			var layer = e.target;
+			layer.setStyle({
+				weight: 8,
+				opacity: 0.8,
+				color: '#e3e3e3',
+				fillColor: '#f02020',
+				fillOpacity: 0.3
+			});
+			layer.bringToFront();
+			info.update(layer.feature.properties);
+		}
+
+		function resetHighlight(e){
+			geojson.resetStyle(e.target);
+			info.update();
+		}
+
+		function onEachFeature(feature, layer) {
+			layer.on({
+				click: highlightFeature,
+				mouseout: resetHighlight,
+			});
+		}
+
+       geojson = L.geoJson.ajax("assets/world_UNHCR.geojson", {
+            style: style,
+			onEachFeature: onEachFeature
+        }).addTo(map);
+
+        var legend = L.control({position: 'bottomright'});
+
+        legend.onAdd = function () {
+            var div = L.DomUtil.create('div', 'legend');
+            // lines for country polygons
+            div.innerHTML += '<b>Refugee Resettlement Quota</b><br />';
+            div.innerHTML += '<i style="background: ' + colors[4] + '; opacity: 0.5"></i><p>More than 3000</p>';
+            div.innerHTML += '<i style="background: ' + colors[3] + '; opacity: 0.5"></i><p>1500 - 3000</p>';
+            div.innerHTML += '<i style="background: ' + colors[2] + '; opacity: 0.5"></i><p>500 - 1500</p>';
+            div.innerHTML += '<i style="background: ' + colors[1] + '; opacity: 0.5"></i><p>Less than 500</p>';
+			div.innerHTML += '<i style="background: ' + colors[0] + '; opacity: 0.5"></i><p>No program</p>';
+            return div;
+            };
+        
+        legend.addTo(map);
+
+        map.attributionControl.addAttribution('Data from <a href="https://www.unhcr.org/">United Nations High Commission for Refugees</a> | This map is made by Gloria Hope');
+
+	</script>
+
+</body>
+
+</html>
